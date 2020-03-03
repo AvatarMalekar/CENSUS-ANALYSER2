@@ -19,8 +19,8 @@ public class CensusAnalyser {
             csvToBeanBuilder.withIgnoreLeadingWhiteSpace(true);
             CsvToBean<IndiaCensusCSV> csvToBean = csvToBeanBuilder.build();
             Iterator<IndiaCensusCSV> censusCSVIterator = csvToBean.iterator();;
-
-            int namOfEateries=0;
+            Iterable<IndiaCensusCSV> censusIterator=()->censusCSVIterator;
+            int namOfEateries = (int) StreamSupport.stream(censusIterator.spliterator(),false).count();
             while (censusCSVIterator.hasNext()) {
                 namOfEateries++;
                 IndiaCensusCSV censusData = censusCSVIterator.next();
