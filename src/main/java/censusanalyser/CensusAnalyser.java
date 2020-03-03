@@ -15,10 +15,10 @@ public class CensusAnalyser<E> {
     public int loadIndiaCensusData(String csvFilePath) throws CensusAnalyserException {
 
         CsvToBean<IndiaCensusCSV> csvToBean;
-        try {
-            Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));
-            Iterator<IndiaCensusCSV> censusCSVIterator = new OpenCSVBuilder().getCSVIterator(reader,IndiaCensusCSV.class);
-            return OpenCSVBuilder.getCount(censusCSVIterator);
+        try(Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
+            ICSVBuilder icsvBuilder=CSVBuilderFactory.createBuilder();
+            Iterator<IndiaCensusCSV> censusCSVIterator = icsvBuilder.getCSVIterator(reader,IndiaCensusCSV.class);
+            return getCount(censusCSVIterator);
 
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
@@ -33,8 +33,9 @@ public class CensusAnalyser<E> {
     public int loadIndiaStateData(String indiaStateCode) {
         CsvToBean<IndiaStateCodeCSV> csvToBean;
         try(Reader reader = Files.newBufferedReader(Paths.get(indiaStateCode));) {
-            Iterator<IndiaStateCodeCSV> censusCSVIterator = new OpenCSVBuilder().getCSVIterator(reader,IndiaStateCodeCSV.class);
-            return OpenCSVBuilder.getCount(censusCSVIterator);
+            ICSVBuilder icsvBuilder=CSVBuilderFactory.createBuilder();
+            Iterator<IndiaStateCodeCSV> censusCSVIterator = icsvBuilder.getCSVIterator(reader,IndiaStateCodeCSV.class);
+            return getCount(censusCSVIterator);
 
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
@@ -45,7 +46,11 @@ public class CensusAnalyser<E> {
                     CensusAnalyserException.ExceptionType.UNABLE_TO_PARSE);
         }
     }
-
+   private <E>int getCount(Iterator<E> censusCSVIterator) {
+        Iterable<E> censusIterator=()-> censusCSVIterator;
+        int namOfEateries = (int) StreamSupport.stream(censusIterator.spliterator(),false).count();
+        return namOfEateries;
+    }
 
 }
 
