@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="censusanalyser.CensusAnalyserTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2020-03-04T06:09:11" hostname="admin1-H110M-H" time="0.173">
+<testsuite name="censusanalyser.CensusAnalyserTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-03-04T07:39:22" hostname="admin1-H110M-H" time="0.215">
   <properties/>
-  <testcase name="givenIndianCensusCSVFileReturnsCorrectRecords" classname="censusanalyser.CensusAnalyserTest" time="0.156"/>
-  <testcase name="givenIndiaStateCode_withCorrectFilePath_ShouldReturn_ExpectedValue" classname="censusanalyser.CensusAnalyserTest" time="0.005"/>
-  <testcase name="givenIndiaCensusData_WithWrongFile_ShouldThrowException" classname="censusanalyser.CensusAnalyserTest" time="0.0"/>
-  <testcase name="givenIndiaStateCode_withCorrectFile_ShouldReturn_ExpectedValue" classname="censusanalyser.CensusAnalyserTest" time="0.011"/>
+  <testcase name="givenIndiaStateCencus_WhenSortedOnState_ShouldReturnSortedResult" classname="censusanalyser.CensusAnalyserTest" time="0.215"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

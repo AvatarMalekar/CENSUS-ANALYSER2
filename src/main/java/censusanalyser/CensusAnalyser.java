@@ -1,5 +1,6 @@
 package censusanalyser;
 
+import com.google.gson.Gson;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
@@ -7,18 +8,21 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-public class CensusAnalyser<E> {
+import static jdk.nashorn.internal.objects.NativeArray.sort;
 
+public class CensusAnalyser<E> {
+    List<IndiaCensusCSV> censusList=null;
     public int loadIndiaCensusData(String csvFilePath){
 
         CsvToBean<IndiaCensusCSV> csvToBean;
         try(Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
             ICSVBuilder icsvBuilder=CSVBuilderFactory.createBuilder();
-           List<IndiaCensusCSV> censusList = icsvBuilder.getCSVFileList(reader,IndiaCensusCSV.class);
+          censusList = icsvBuilder.getCSVFileList(reader,IndiaCensusCSV.class);
            return censusList.size();
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
@@ -52,5 +56,28 @@ public class CensusAnalyser<E> {
         return namOfEateries;
     }
 
+    public String getStateWiseSortCensusData() {
+            if(censusList.size()==0 || censusList==null){
+                throw new CensusAnalyserException(CensusAnalyserException.ExceptionType.NO_CENSUS_DATA);
+            }
+            Comparator<IndiaCensusCSV> censusCSVComparator=Comparator.comparing(StateCensus->StateCensus.state);
+            this.sort(censusCSVComparator);
+            String json=new Gson().toJson(censusList);
+            return json;
+
+    }
+
+    private void sort(Comparator<IndiaCensusCSV> censusCSVComparator) {
+        for(int i=0;i<censusList.size()-1;i++){
+            for(int j=0;j<censusList.size()-i-1;j++){
+                IndiaCensusCSV census1=censusList.get(j);
+                IndiaCensusCSV census2=censusList.get(j+1);
+                if(censusCSVComparator.compare(census1,census2)>0){
+                    censusList.set(j,census2);
+                    censusList.set(j+1,census1);
+                }
+            }
+        }
+    }
 }
 
