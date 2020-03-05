@@ -14,18 +14,19 @@ import java.util.stream.StreamSupport;
 public class CensusAnalyser<E> {
     List<CensusDTO> censusList=null;
     Map<String, CensusDTO> censusMap=null;
-
+    public enum Country{
+        INDIA,US;
+    }
     public CensusAnalyser() {
         censusList=new ArrayList<>();
         censusMap=new HashMap<>();
     }
 
-    public int loadIndiaCensusData(String ...csvFilePath){
-        censusMap=new CensusLoader().loadCensusData(IndiaCensusCSV.class,csvFilePath);
+    public int loadCensusData(Country country,String ...csvFilePath){
+        censusMap=new CensusLoader().loadCensusData(country,csvFilePath);
         censusList=censusMap.values().stream().collect(Collectors.toList());
         return censusMap.size();
     }
-
 
     private <E>int getCount(Iterator<E> censusCSVIterator) {
         Iterable<E> censusIterator=()-> censusCSVIterator;
@@ -73,11 +74,6 @@ public class CensusAnalyser<E> {
         this.sort(censusCSVComparator);
         String json=new Gson().toJson(censusList);
         return json;
-    }
-    public int loadUSCensusData(String ...usCensusCsvFilePath) {
-        censusMap=new CensusLoader().loadCensusData(USCensusCSV.class,usCensusCsvFilePath);
-        censusList=censusMap.values().stream().collect(Collectors.toList());
-        return censusMap.size();
     }
 }
 
