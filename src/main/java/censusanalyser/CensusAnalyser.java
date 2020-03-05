@@ -22,16 +22,25 @@ public class CensusAnalyser<E> {
 
     public int loadIndiaCensusData(String csvFilePath){
 
-        CsvToBean<IndiaCensusCSV> csvToBean;
+        return loadCensusData(csvFilePath,IndiaCensusCSV.class);
+    }
+
+    private <E>int loadCensusData(String csvFilePath,Class<E> className) {
+        CsvToBean<E> csvToBean;
         try(Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
-            ICSVBuilder icsvBuilder=CSVBuilderFactory.createBuilder();
-            Iterator<IndiaCensusCSV> stateCensus=icsvBuilder.getCSVIterator(reader,IndiaCensusCSV.class);
-            while(stateCensus.hasNext()){
-                CensusDTO tempObj=new CensusDTO(stateCensus.next());
-                this.censusMap.put(tempObj.state,tempObj);
-            }
+            ICSVBuilder icsvBuilder= CSVBuilderFactory.createBuilder();
+            Iterator<E> stateCensus=icsvBuilder.getCSVIterator(reader,className);
+            Iterable<E> stateCodeCSV= ()-> stateCensus;
+            if(className.getName().equals("censusanalyser.IndiaCensusCSV")){
+                StreamSupport.stream(stateCodeCSV.spliterator(),false)
+                    .map(IndiaCensusCSV.class::cast)
+                    .forEach(code->censusMap.put(code.state,new CensusDTO(code)));}
+            if(className.getName().equals("censusanalyser.USCensusCSV")){
+                StreamSupport.stream(stateCodeCSV.spliterator(),false)
+                        .map(USCensusCSV.class::cast)
+                        .forEach(code->censusMap.put(code.stateUs,new CensusDTO(code)));}
             censusList=censusMap.values().stream().collect(Collectors.toList());
-           return censusMap.size();
+            return censusList.size();
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
                     CensusAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
@@ -41,17 +50,19 @@ public class CensusAnalyser<E> {
                     CensusAnalyserException.ExceptionType.UNABLE_TO_PARSE);
         }
     }
+
 
     public int loadIndiaStateData(String indiaStateCode) {
         CsvToBean<IndiaStateCodeCSV> csvToBean;
         try(Reader reader = Files.newBufferedReader(Paths.get(indiaStateCode));) {
             ICSVBuilder icsvBuilder=CSVBuilderFactory.createBuilder();
-           Iterator<IndiaStateCodeCSV> codeIterator=icsvBuilder.getCSVIterator(reader,IndiaStateCodeCSV.class);
-           Iterable<IndiaStateCodeCSV> stateCodeCSV= ()-> codeIterator;
-           StreamSupport.stream(stateCodeCSV.spliterator(),false)
-                   .filter(indiaStateCodeCSV -> censusMap.get(indiaStateCodeCSV)!=null)
-                   .forEach(code->censusMap.get(code).stateCode=code.stateCode);
-            return censusMap.size();
+            Iterator<IndiaStateCodeCSV> codeIterator=icsvBuilder.getCSVIterator(reader,IndiaStateCodeCSV.class);
+            Iterable<IndiaStateCodeCSV> stateCodeCSV= ()-> codeIterator;
+            StreamSupport.stream(stateCodeCSV.spliterator(),false)
+                    .filter(indiaStateCodeCSV -> censusMap.get(indiaStateCodeCSV)!=null)
+                    .forEach(code->censusMap.get(code).stateCode=code.stateCode);
+            censusList=censusMap.values().stream().collect(Collectors.toList());
+            return censusList.size();
 
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
@@ -62,20 +73,20 @@ public class CensusAnalyser<E> {
                     CensusAnalyserException.ExceptionType.UNABLE_TO_PARSE);
         }
     }
-   private <E>int getCount(Iterator<E> censusCSVIterator) {
+    private <E>int getCount(Iterator<E> censusCSVIterator) {
         Iterable<E> censusIterator=()-> censusCSVIterator;
         int namOfEateries = (int) StreamSupport.stream(censusIterator.spliterator(),false).count();
         return namOfEateries;
     }
 
     public String getStateWiseSortCensusData() {
-            if(censusMap.size()==0 || censusMap==null){
-                throw new CensusAnalyserException(CensusAnalyserException.ExceptionType.NO_CENSUS_DATA);
-            }
-            Comparator<CensusDTO> censusCSVComparator=Comparator.comparing(StateCensus->StateCensus.state);
-            this.sort(censusCSVComparator);
-            String json=new Gson().toJson(censusList);
-            return json;
+        if(censusMap.size()==0 || censusMap==null){
+            throw new CensusAnalyserException(CensusAnalyserException.ExceptionType.NO_CENSUS_DATA);
+        }
+        Comparator<CensusDTO> censusCSVComparator=Comparator.comparing(StateCensus->StateCensus.state);
+        this.sort(censusCSVComparator);
+        String json=new Gson().toJson(censusList);
+        return json;
 
     }
 
@@ -111,28 +122,8 @@ public class CensusAnalyser<E> {
         String json=new Gson().toJson(censusList);
         return json;
     }
-
-
     public int loadUSCensusData(String usCensusCsvFilePath) {
-        CsvToBean<USCensusCSV> csvToBean;
-        try(Reader reader = Files.newBufferedReader(Paths.get(usCensusCsvFilePath));) {
-            ICSVBuilder icsvBuilder=CSVBuilderFactory.createBuilder();
-            Iterator<USCensusCSV> usCensus=icsvBuilder.getCSVIterator(reader,USCensusCSV.class);
-            while(usCensus.hasNext()){
-                CensusDTO tempObj=new CensusDTO(usCensus.next());
-                this.censusMap.put(tempObj.state,tempObj);
-            }
-            censusList=censusMap.values().stream().collect(Collectors.toList());
-            return censusMap.size();
-        } catch (IOException e) {
-            throw new CensusAnalyserException(e.getMessage(),
-                    CensusAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
-        }
-        catch (IllegalStateException e) {
-            throw new CensusAnalyserException(e.getMessage(),
-                    CensusAnalyserException.ExceptionType.UNABLE_TO_PARSE);
-        }
-
+        return loadCensusData(usCensusCsvFilePath,USCensusCSV.class);
     }
 }
 
