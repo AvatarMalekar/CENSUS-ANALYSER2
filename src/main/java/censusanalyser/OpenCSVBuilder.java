@@ -10,7 +10,7 @@ import java.util.logging.Level;
 
 public class OpenCSVBuilder implements ICSVBuilder {
 
-        public <E > Iterator < E > getCSVIterator(Reader reader, Class csvClass) {
+        public <E> Iterator <E> getCSVIterator(Reader reader, Class csvClass) {
             return (Iterator<E>) getCSVBean(reader,csvClass).iterator();
     }
 
