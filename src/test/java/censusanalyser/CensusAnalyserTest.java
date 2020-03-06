@@ -36,7 +36,6 @@ public class CensusAnalyserTest {
     public void givenIndiaStateCode_withCorrectFile_ShouldReturn_ExpectedValue() {
         try {
             int numOfRecords= censusAnalyser.loadCensusData(CensusAnalyser.Country.INDIA,INDIA_CENSUS_CSV_FILE_PATH,INDIA_STATE_CODE);
-
             Assert.assertEquals(29,numOfRecords);
         } catch (CensusAnalyserException e) { }
     }

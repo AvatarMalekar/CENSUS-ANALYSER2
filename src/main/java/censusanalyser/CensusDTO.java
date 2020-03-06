@@ -2,10 +2,10 @@ package censusanalyser;
 
 public class CensusDTO {
     public String state;
-     public int population;
-     public double totalArea;
-     public double populationDensity;
-     public String stateCode;
+    public int population;
+    public double totalArea;
+    public double populationDensity;
+    public String stateCode;
 
     public CensusDTO(IndiaCensusCSV csvObj) {
         state=csvObj.state;

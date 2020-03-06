@@ -1,12 +1,7 @@
 package censusanalyser;
 
 import com.google.gson.Gson;
-import com.opencsv.bean.CsvToBean;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -23,7 +18,7 @@ public class CensusAnalyser<E> {
     }
 
     public int loadCensusData(Country country,String ...csvFilePath){
-        censusMap=new CensusLoader().loadCensusData(country,csvFilePath);
+        censusMap= CensusAdapterFactory.getCensusAdapter(country,csvFilePath);
         censusList=censusMap.values().stream().collect(Collectors.toList());
         return censusMap.size();
     }
@@ -42,7 +37,6 @@ public class CensusAnalyser<E> {
         this.sort(censusCSVComparator);
         String json=new Gson().toJson(censusList);
         return json;
-
     }
 
     private void sort(Comparator<CensusDTO> censusCSVComparator) {
