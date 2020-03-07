@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.stream.StreamSupport;
 
 abstract class CensusAdapter {
-
     List<CensusDTO> censusList=new ArrayList<>();
    abstract Map<String, CensusDTO> loadCensusData(String... csvFilePath);
     public <E>Map<String, CensusDTO> loadCensusData(Class<E> className, String csvFilePath) {
@@ -28,7 +27,7 @@ abstract class CensusAdapter {
             if(className.getName().equals("censusanalyser.USCensusCSV")){
                 StreamSupport.stream(stateCodeCSV.spliterator(),false)
                         .map(USCensusCSV.class::cast)
-                        .forEach(code->censusMap.put(code.stateUs,new CensusDTO(code)));}
+                        .forEach(code->censusMap.put(code.stateus,new CensusDTO(code)));}
             return censusMap;
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
